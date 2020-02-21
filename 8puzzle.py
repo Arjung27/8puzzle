@@ -9,12 +9,13 @@ class Node:
 
     def __init__(self, key, parent):
         self.key = key
-        self.child = []
         self.position = key.find('0')
         self.parent = parent
 
 def convertToRow(initialState):
-
+    """
+    Function to convert the column form to row form
+    """
     size = np.sqrt(len(initialState))
     rowform = ''
     for i in range(int(size)):
@@ -25,6 +26,10 @@ def convertToRow(initialState):
     return rowform
 
 def isSolvable(state):
+    """
+    Function to check if the solution exists from the current node
+    configuration
+    """
 
     invCount = 0
     size = len(state)
@@ -36,12 +41,17 @@ def isSolvable(state):
     return 1 
 
 def isOpen(node, closedNode):
-
+    """
+    To check if the node is already visited or not
+    """
     if node.key in closedNode:
         return 0
     return 1
 
 def getChild(node, nodeList):
+    """
+    Function to find all the children associated with the node
+    """
 
     # Calculating the row number of the element for puzzle size 3**2
     puzzleSize = 3
@@ -80,6 +90,9 @@ def getChild(node, nodeList):
     	nodeList.put(Node(tempKey, node))
 
 def findSolution(initialState, goalState):
+    """
+    Function implementing the bfs algorithm
+    """
     
     if (initialState == goalState):
         return 1, Node(initialState, None)
@@ -109,6 +122,10 @@ def findSolution(initialState, goalState):
     return 0, None
 
 def writeFile(file, stack):
+    """
+    Function to write the final result in the file
+    """
+
     while(stack.qsize() != 0):
         top = stack.get()
         for s in top:
@@ -116,6 +133,7 @@ def writeFile(file, stack):
         file.write('\n')
 
 if __name__ == '__main__':
+    
     initialState = sys.argv[1]
     goalState = '147258360'
     if initialState == goalState:
