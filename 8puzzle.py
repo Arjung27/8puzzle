@@ -65,6 +65,7 @@ def getChild(node, nodeList, closedNode, count):
         newNode = Node(tempKey, node, count)
         if isOpen(newNode, closedNode):
            nodeList.put(newNode)
+           count += 1
 
     if (row + 1 < puzzleSize):
         tempKey = list(node.key)[:]
@@ -72,10 +73,10 @@ def getChild(node, nodeList, closedNode, count):
         tempKey[int((row + 1)*puzzleSize + col)] = '0'
         tempKey[node.position] = temp
         tempKey = "".join(tempKey)
-        count += 1
         newNode = Node(tempKey, node, count)
         if isOpen(newNode, closedNode):
            nodeList.put(newNode)
+           count += 1
 
     if (col - 1 >= 0):
         tempKey = list(node.key)[:]
@@ -83,10 +84,10 @@ def getChild(node, nodeList, closedNode, count):
         tempKey[int((row)*puzzleSize + col - 1)] = '0'
         tempKey[node.position] = temp
         tempKey = "".join(tempKey)
-        count += 1
         newNode = Node(tempKey, node, count)
         if isOpen(newNode, closedNode):
            nodeList.put(newNode)
+           count += 1
 
     if (col + 1 < puzzleSize):
         tempKey = list(node.key)[:]
@@ -94,10 +95,10 @@ def getChild(node, nodeList, closedNode, count):
         tempKey[int((row)*puzzleSize + col + 1)] = '0'
         tempKey[node.position] = temp
         tempKey = "".join(tempKey)
-        count += 1
         newNode = Node(tempKey, node, count)
         if isOpen(newNode, closedNode):
            nodeList.put(newNode)
+           count += 1
 
     return count
 
@@ -112,6 +113,7 @@ def findSolution(initialState, goalState):
     allNode = Queue()
     count = 0
     root = Node(initialState, None, count)
+    count += 1
     if isSolvable(initialState):
         nodeList.put(root)
         while(nodeList.qsize() != 0):
@@ -121,7 +123,6 @@ def findSolution(initialState, goalState):
                 return 1, currNode, closedNode, allNode
             elif isOpen(currNode, closedNode):
                 allNode.put(currNode)
-                count += 1
                 closedNode.add(currNode.key)
                 if isSolvable(currNode.key):
                     count = getChild(currNode, nodeList, closedNode, count)
@@ -176,10 +177,7 @@ if __name__ == '__main__':
     while(allNode.qsize() != 1):
         ele = allNode.get()
         if count != 1:
-            file.write(str(count) + " " + str(ele.index) + " " + str(ele.parent.index))
-            file.write('\n')
-        else:
-            file.write(str(count) + " " + str(ele.index) + " " + str(ele.index))
+            file.write(str(ele.index) + " " + str(ele.parent.index) + " " + str(0))
             file.write('\n')
         count += 1
     
