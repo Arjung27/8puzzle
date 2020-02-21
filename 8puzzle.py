@@ -5,10 +5,11 @@ from queue import LifoQueue
 
 class Node:
 
-    def __init__(self, key, parent):
+    def __init__(self, key, parent, index):
         self.key = key
         self.position = key.find('0')
         self.parent = parent
+        self.index = index
 
 def convertToRow(initialState):
     """
@@ -46,7 +47,7 @@ def isOpen(node, closedNode):
         return 0
     return 1
 
-def getChild(node, nodeList):
+def getChild(node, nodeList, closedNode, count):
     """
     Function to find all the children associated with the node
     """
@@ -56,68 +57,81 @@ def getChild(node, nodeList):
     row = int(node.position/puzzleSize)
     col = int(node.position%puzzleSize)
     if (row - 1 >= 0):
-    	tempKey = list(node.key)[:]
-    	temp = tempKey[int((row - 1)*puzzleSize + col)]
-    	tempKey[int((row - 1)*puzzleSize + col)] = '0'
-    	tempKey[node.position] = temp
-    	tempKey = "".join(tempKey)
-    	nodeList.put(Node(tempKey, node))
+        tempKey = list(node.key)[:]
+        temp = tempKey[int((row - 1)*puzzleSize + col)]
+        tempKey[int((row - 1)*puzzleSize + col)] = '0'
+        tempKey[node.position] = temp
+        tempKey = "".join(tempKey)
+        newNode = Node(tempKey, node, count)
+        if isOpen(newNode, closedNode):
+           nodeList.put(newNode)
 
     if (row + 1 < puzzleSize):
-    	tempKey = list(node.key)[:]
-    	temp = tempKey[int((row + 1)*puzzleSize + col)]
-    	tempKey[int((row + 1)*puzzleSize + col)] = '0'
-    	tempKey[node.position] = temp
-    	tempKey = "".join(tempKey)
-    	nodeList.put(Node(tempKey, node))
+        tempKey = list(node.key)[:]
+        temp = tempKey[int((row + 1)*puzzleSize + col)]
+        tempKey[int((row + 1)*puzzleSize + col)] = '0'
+        tempKey[node.position] = temp
+        tempKey = "".join(tempKey)
+        count += 1
+        newNode = Node(tempKey, node, count)
+        if isOpen(newNode, closedNode):
+           nodeList.put(newNode)
 
     if (col - 1 >= 0):
-    	tempKey = list(node.key)[:]
-    	temp = tempKey[int(row*puzzleSize + col - 1)]
-    	tempKey[int((row)*puzzleSize + col - 1)] = '0'
-    	tempKey[node.position] = temp
-    	tempKey = "".join(tempKey)
-    	nodeList.put(Node(tempKey, node))
+        tempKey = list(node.key)[:]
+        temp = tempKey[int(row*puzzleSize + col - 1)]
+        tempKey[int((row)*puzzleSize + col - 1)] = '0'
+        tempKey[node.position] = temp
+        tempKey = "".join(tempKey)
+        count += 1
+        newNode = Node(tempKey, node, count)
+        if isOpen(newNode, closedNode):
+           nodeList.put(newNode)
 
     if (col + 1 < puzzleSize):
-    	tempKey = list(node.key)[:]
-    	temp = tempKey[int(row*puzzleSize + col + 1)]
-    	tempKey[int((row)*puzzleSize + col + 1)] = '0'
-    	tempKey[node.position] = temp
-    	tempKey = "".join(tempKey)
-    	nodeList.put(Node(tempKey, node))
+        tempKey = list(node.key)[:]
+        temp = tempKey[int(row*puzzleSize + col + 1)]
+        tempKey[int((row)*puzzleSize + col + 1)] = '0'
+        tempKey[node.position] = temp
+        tempKey = "".join(tempKey)
+        count += 1
+        newNode = Node(tempKey, node, count)
+        if isOpen(newNode, closedNode):
+           nodeList.put(newNode)
+
+    return count
 
 def findSolution(initialState, goalState):
     """
     Function implementing the bfs algorithm
     """
-    
-    if (initialState == goalState):
-        return 1, Node(initialState, None)
-
     initialState = convertToRow(initialState)
     goalState = convertToRow(goalState)
     closedNode = set()
     nodeList = Queue()
-    root = Node(initialState, None)
+    allNode = Queue()
     count = 0
+    root = Node(initialState, None, count)
     if isSolvable(initialState):
         nodeList.put(root)
         while(nodeList.qsize() != 0):
             currNode = nodeList.get()
             if currNode.key == goalState:
-                return 1, currNode
+                allNode.put(currNode)
+                return 1, currNode, closedNode, allNode
             elif isOpen(currNode, closedNode):
+                allNode.put(currNode)
+                count += 1
                 closedNode.add(currNode.key)
                 if isSolvable(currNode.key):
-                    getChild(currNode, nodeList)
+                    count = getChild(currNode, nodeList, closedNode, count)
                 else: 
                     continue
             else:
                 continue
     else:
-        return 0, None
-    return 0, None
+        return 0, None, closedNode, allNode
+    return 0, None, closedNode, allNode
 
 def writeFile(file, stack):
     """
@@ -137,7 +151,7 @@ if __name__ == '__main__':
     if initialState == goalState:
         print("Initial State is same the goal state")
         exit(-1)
-    flag, node = findSolution(initialState, goalState)
+    flag, node, list_, allNode = findSolution(initialState, goalState)
     file = open('nodePath.txt', 'w+')
     stack = LifoQueue()
     if flag:
@@ -150,4 +164,22 @@ if __name__ == '__main__':
         print('No solution exists')
 
     writeFile(file, stack)
+
+    file = open('Nodes.txt', 'w+')
+    for ele in list_:
+        for s in ele:
+            file.write(s + " ")
+        file.write('\n')
+
+    file = open('NodesInfo.txt', 'w+')
+    count = 1
+    while(allNode.qsize() != 1):
+        ele = allNode.get()
+        if count != 1:
+            file.write(str(count) + " " + str(ele.index) + " " + str(ele.parent.index))
+            file.write('\n')
+        else:
+            file.write(str(count) + " " + str(ele.index) + " " + str(ele.index))
+            file.write('\n')
+        count += 1
     
