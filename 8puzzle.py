@@ -27,7 +27,7 @@ def isSolvable(state):
     size = len(state)
     for i in range(0, size-1):
         for j in range(i+1, size):
-            if (state[j] and state[i] and  state[i] > state[j]):
+            if (int(state[j]) and int(state[i]) and  state[i] > state[j]):
                 invCount += 1
     return (invCount%2 == 0)
 
@@ -46,7 +46,7 @@ def isOpen(node, closedNode):
 
     for n in closedNode:
         if (n.position == node.position):
-            if (n.key == nod.key):
+            if (n.key == node.key):
                 return 0
     return 1
 
@@ -56,9 +56,38 @@ def getChild(node, nodeList):
     puzzleSize = 3
     row = int(node.position/puzzleSize)
     col = int(node.position%puzzleSize)
-
     if (row - 1 >= 0):
-        
+    	tempKey = list(node.key)[:]
+    	temp = tempKey[int((row - 1)*puzzleSize + col)]
+    	tempKey[int((row - 1)*puzzleSize + col)] = '0'
+    	tempKey[node.position] = temp
+    	tempKey = "".join(tempKey)
+    	nodeList.put(Node(tempKey))
+
+    if (row + 1 < puzzleSize):
+    	tempKey = list(node.key)[:]
+    	temp = tempKey[int((row + 1)*puzzleSize + col)]
+    	tempKey[int((row + 1)*puzzleSize + col)] = '0'
+    	tempKey[node.position] = temp
+    	tempKey = "".join(tempKey)
+    	nodeList.put(Node(tempKey))
+
+    if (col - 1 >= 0):
+    	tempKey = list(node.key)[:]
+    	temp = tempKey[int(row*puzzleSize + col - 1)]
+    	tempKey[int((row)*puzzleSize + col - 1)] = '0'
+    	tempKey[node.position] = temp
+    	tempKey = "".join(tempKey)
+    	nodeList.put(Node(tempKey))
+
+    if (col + 1 < puzzleSize):
+    	tempKey = list(node.key)[:]
+    	temp = tempKey[int(row*puzzleSize + col + 1)]
+    	tempKey[int((row)*puzzleSize + col + 1)] = '0'
+    	tempKey[node.position] = temp
+    	tempKey = "".join(tempKey)
+    	nodeList.put(Node(tempKey))
+
 
 def findSolution(initialState, goalState):
     
@@ -70,15 +99,19 @@ def findSolution(initialState, goalState):
     closedNode = []
     nodeList = Queue()
     root = Node(initialState)
-
+    count = 0
     if isSolvable(initialState):
         nodeList.put(root)
         while(nodeList.qsize() != 0):
+            count += 1
+            print(count)
             currNode = nodeList.get()
             if currNode.key == goalState:
                 return 1
             elif isOpen(currNode, closedNode):
+                # print(isSolvable(currNode.key))
                 if isSolvable(currNode.key):
+                    closedNode.append(currNode)
                     getChild(currNode, nodeList)
                 else: 
                     continue
@@ -87,7 +120,7 @@ def findSolution(initialState, goalState):
     else:
         return 0
 
-    return 1
+    return 0
 
 if __name__ == '__main__':
     initialState = sys.argv[1]
