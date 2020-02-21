@@ -1,9 +1,7 @@
-import os
 import numpy as np
 import sys
 from queue import Queue
 from queue import LifoQueue
-import time
 
 class Node:
 
@@ -133,7 +131,7 @@ def writeFile(file, stack):
         file.write('\n')
 
 if __name__ == '__main__':
-    
+
     initialState = sys.argv[1]
     goalState = '147258360'
     if initialState == goalState:
