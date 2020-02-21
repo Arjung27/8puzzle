@@ -2,6 +2,7 @@ import os
 import numpy as np
 import sys
 from queue import Queue
+import time
 
 class Node:
 
@@ -103,15 +104,14 @@ def findSolution(initialState, goalState):
     if isSolvable(initialState):
         nodeList.put(root)
         while(nodeList.qsize() != 0):
-            count += 1
-            print(count)
             currNode = nodeList.get()
             if currNode.key == goalState:
                 return 1
             elif isOpen(currNode, closedNode):
-                # print(isSolvable(currNode.key))
+                count += 1
+                print(count)
+                closedNode.append(currNode)
                 if isSolvable(currNode.key):
-                    closedNode.append(currNode)
                     getChild(currNode, nodeList)
                 else: 
                     continue
@@ -125,8 +125,10 @@ def findSolution(initialState, goalState):
 if __name__ == '__main__':
     initialState = sys.argv[1]
     goalState = '147258360'
-
+    start = time.time()
     if findSolution(initialState, goalState):
         print('Path found')
     else:
         print('No solution exists')
+    end = time.time()
+    print(end - start)
